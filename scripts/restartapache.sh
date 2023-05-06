@@ -14,7 +14,7 @@ echo '<=======================  apache & php  ===========================>' | su
 echo 'apache' | sudo tee -a $log
 
 cat /etc/httpd/conf/httpd.conf | grep -v "httpd-vhosts-443.conf" | sudo tee /etc/httpd/conf/httpd.conf > /dev/null
-echo "Include /var/www/html/login_front_material/scripts/httpd-vhosts-443.conf" | sudo tee -a /etc/httpd/conf/httpd.conf > /dev/null
+echo "Include /var/www/html/angular_yourbook/scripts/httpd-vhosts-443.conf" | sudo tee -a /etc/httpd/conf/httpd.conf > /dev/null
 
 cat /etc/httpd/conf/httpd.conf | grep -v "Listen 443" | sudo tee /etc/httpd/conf/httpd.conf > /dev/null
 echo "Listen 443" | sudo tee -a /etc/httpd/conf/httpd.conf > /dev/null

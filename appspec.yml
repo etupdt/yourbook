@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
   - source: /
-    destination: /var/www/html/yourbook
+    destination: /var/www/html/angular_yourbook
 hooks:
    BeforeInstall:
     - location: scripts/startapache.sh

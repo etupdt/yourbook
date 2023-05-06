@@ -1,0 +1,32 @@
+version: 0.2
+phases:
+  install:
+    runtime-versions:
+      nodejs: 16
+    commands:
+      - pwd
+      - ls -lrt
+      - npm install
+      - npm install -g @angular/cli
+      - npm update
+      - ls -lrt
+  pre_build:
+    commands:
+      - echo Installing source NPM dependencies...
+  build:
+    commands:
+      - echo Build started on `date`
+      - ng build --configuration=production
+      - npm prune --production
+  post_build:
+    commands:
+      - cp appspec.yml dist/
+      - cp -r scripts dist/
+      - cd dist
+      - pwd
+      - ls -lrt
+      - echo Build completed on `date`
+artifacts:
+  base-directory: dist
+  files:
+    - "**/*"

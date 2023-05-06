@@ -1,0 +1,21 @@
+<div class="external-zone">
+  <div class="internal-zone">
+
+    <p>{{book.livre_id}}</p>
+
+    <p>{{book.isbn}}</p>
+
+    <p>{{book.titre}}</p>
+
+    <p>{{book.auteur.prenom}} {{book.auteur.nom}}</p>
+
+    <ul>
+      <li *ngFor="let genre of book.genres">
+        {{genre.nom}}
+      </li>
+    </ul>
+
+    <p>{{book.editeur.nom}}</p>
+
+  </div>
+</div>

@@ -13,7 +13,7 @@ import { environment } from 'src/environments/environment';
 export class BookService implements OnInit{
 
   book: Book = {
-    livre_id: 0,
+    id: 0,
     isbn: '',
     titre: '',
     auteur: {
@@ -66,7 +66,7 @@ export class BookService implements OnInit{
   putBookById(book: Book): Observable<any> {
 
     return this.http.put(
-      environment.useBackend + `/book/${book.livre_id}`,
+      environment.useBackend + `/book/${book.id}`,
       book
     )
 
@@ -76,7 +76,7 @@ export class BookService implements OnInit{
 
     let bookSansId = book
 
-    delete bookSansId.livre_id
+    delete bookSansId.id
 
     return this.http.post(
       environment.useBackend + `/book/`,
@@ -120,58 +120,25 @@ export class BookService implements OnInit{
 
   getEditeurs() {
 
-    this.http.get(
+    return this.http.get(
       environment.useBackend + `/editeur/`
-    ).subscribe({
-      next: (res: any) => {
-        console.log(res)
-        this.editeurs = res
-      },
-      error: (error: { error: { message: any; }; }) => {
-        alert('erreur sur get editeurs')
-      },
-      complete () {
-        console.log(`get parameters for editeurs complete`)
-      }
-    })
+    )
 
   }
 
   getGenres() {
 
-    this.http.get(
+    return this.http.get(
       environment.useBackend + `/genre/`
-    ).subscribe({
-      next: (res: any) => {
-        console.log(res)
-        this.genres = res
-      },
-      error: (error: { error: { message: any; }; }) => {
-        alert('erreur sur get genres')
-      },
-      complete () {
-        console.log(`get parameters for genres complete`)
-      }
-    })
+    )
 
   }
 
   getAuteurs() {
 
-    this.http.get(
+    return this.http.get(
       environment.useBackend + `/auteur/`
-    ).subscribe({
-      next: (res: any) => {
-        console.log(res)
-        this.auteurs = res
-      },
-      error: (error: { error: { message: any; }; }) => {
-        alert('erreur sur get auteurs')
-      },
-      complete () {
-        console.log(`get parameters for auteurs complete`)
-      }
-    })
+    )
 
   }
 

@@ -20,6 +20,7 @@ import { AboutComponent } from './pages/about/about.component';
 import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
+import { BookFilterPipe } from './pages/catalog/book-filter.pipe';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { HttpClientModule } from '@angular/common/http';
     CatalogComponent,
     AboutComponent,
     ContactComponent,
-    LoginComponent
+    LoginComponent,
+    BookFilterPipe
   ],
   imports: [
     BrowserModule,

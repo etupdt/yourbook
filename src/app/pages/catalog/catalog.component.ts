@@ -1,13 +1,11 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { Auteur } from 'src/app/interfaces/auteur.interface';
+import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
+import { HashTable } from 'src/app/interfaces/hashtable.interface';
 import { BookService } from 'src/app/services/book/book.service';
-
-interface HashTable<T> {
-  [key: string]: T;
-}
 
 @Component({
   selector: 'app-catalog',
@@ -18,7 +16,8 @@ export class CatalogComponent {
 
   errorMessage: string = ''
 
-  listeAll: boolean = true
+  checked: boolean = true
+  refresh: number = 0
 
   editeurs!: Editeur[]
   editeursChecked: HashTable<Editeur> = {}
@@ -37,48 +36,31 @@ export class CatalogComponent {
 
     this.getBooksFromBdd()
 
-    this.editeurs = this.bookService.editeurs
-    this.bookService.editeurs.forEach(element => {
-      element.checked = false
-      this.editeursChecked[element.nom] = element
-    });
-    this.genres = this.bookService.genres
-    this.bookService.genres.forEach(element => {
-      element.checked = false
-      this.genresChecked[element.nom] = element
-    });
-    this.auteurs = this.bookService.auteurs
-    this.bookService.auteurs.forEach(element => {
-      element.checked = false
-      this.auteursChecked[element.nom] = element
-    });
+  }
 
+  checkAll = () => {
+    this.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
+    this.genres.forEach((genre: Genre) => genre.checked = false)
+    this.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
+    this.checked = !this.checked
   }
 
   checkEditeur = (nom: string) => {
     this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
-    this.listeAll = false
+    this.checked = false
+    this.refresh++
   }
 
   checkGenre = (nom: string) => {
     this.genresChecked[nom].checked = !this.genresChecked[nom].checked
-    this.listeAll = false
-  }
-
-  testGenres = (genres: Genre[]) => {
-    let retour = false
-    genres.forEach((genre: Genre) => {
-      console.log('debug',genre)
-      if (this.genresChecked[genre['nom']].checked) {
-        retour = true
-      }
-    })
-    return retour
+    this.checked = false
+    this.refresh++
   }
 
   checkAuteur = (nom: string) => {
     this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
-    this.listeAll = false
+    this.checked = false
+    this.refresh++
   }
 
   navigateTo = (index?: Number) => {
@@ -94,9 +76,9 @@ export class CatalogComponent {
   getBooksFromBdd = () => {
 
     this.bookService.getBooksByStatus('non_loue').subscribe({
-      next: (res: any) => {
-        console.log(res)
+      next: (res: Book[]) => {
         this.bookService.books = res
+        this.getEditeursFromBdd()
       },
       error: (error: { error: { message: any; }; }) => {
         this.errorMessage = error.error.message
@@ -105,6 +87,81 @@ export class CatalogComponent {
         console.log('header getBooks complete')
       }
     })
+
+  }
+
+  getEditeursFromBdd() {
+
+    this.bookService.getEditeurs().subscribe({
+      next: (res: any) => {
+        console.log(res)
+        this.bookService.editeurs = res
+        this.getGenresFromBdd()
+      },
+      error: (error: { error: { message: any; }; }) => {
+        alert('erreur sur get editeurs')
+      },
+      complete () {
+        console.log(`get parameters for editeurs complete`)
+      }
+    })
+
+  }
+
+  getGenresFromBdd() {
+
+    this.bookService.getGenres().subscribe({
+      next: (res: any) => {
+        console.log(res)
+        this.bookService.genres = res
+        this.getAuteursFromBdd()
+      },
+      error: (error: { error: { message: any; }; }) => {
+        alert('erreur sur get genres')
+      },
+      complete () {
+        console.log(`get parameters for genres complete`)
+      }
+    })
+
+  }
+
+  getAuteursFromBdd() {
+
+    this.bookService.getAuteurs().subscribe({
+      next: (res: any) => {
+        console.log(res)
+        this.bookService.auteurs = res
+        this.initTemplate()
+      },
+      error: (error: { error: { message: any; }; }) => {
+        alert('erreur sur get auteurs')
+      },
+      complete () {
+        console.log(`get parameters for auteurs complete`)
+      }
+    })
+
+  }
+
+  initTemplate = () => {
+
+    this.editeurs = this.bookService.editeurs
+    this.bookService.editeurs.forEach(element => {
+      element.checked = false
+      this.editeursChecked[element.nom] = element
+    });
+    console.log(this.editeurs)
+    this.genres = this.bookService.genres
+    this.bookService.genres.forEach(element => {
+      element.checked = false
+      this.genresChecked[element.nom] = element
+    });
+    this.auteurs = this.bookService.auteurs
+    this.bookService.auteurs.forEach(element => {
+      element.checked = false
+      this.auteursChecked[element.nom] = element
+    });
 
   }
 

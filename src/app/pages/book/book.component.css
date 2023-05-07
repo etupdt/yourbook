@@ -1,7 +1,14 @@
 
-.book {
-  padding-top: 85px;
+.page {
+  padding-top: 105px;
+  padding-bottom: 20px;
   margin: auto;
-  width: 60%;
-  min-width: 1200px;
+  width: 40%;
+  min-width: 700px;
+  height: 77.7vh;
+}
+
+.book-card {
+  border: 1px solid lightgrey;
+  height: 100%;
 }

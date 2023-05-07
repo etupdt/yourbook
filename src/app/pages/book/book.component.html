@@ -1,19 +1,21 @@
-<div class="book">
+<div class="page">
+  <div class="card shadow book-card">
 
-    <p>{{book.livre_id}}</p>
+    <h1>{{book.titre}}</h1>
+
+    <p>{{book.id}}</p>
 
     <p>{{book.isbn}}</p>
-
-    <p>{{book.titre}}</p>
 
     <p>{{book.auteur.prenom}} {{book.auteur.nom}}</p>
 
     <ul>
       <li *ngFor="let genre of book.genres">
-        {{genre.nom}}
+        {{genre.genre.nom}}
       </li>
     </ul>
 
     <p>{{book.editeur.nom}}</p>
 
+  </div>
 </div>

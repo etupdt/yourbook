@@ -1,45 +1,53 @@
-<div class="row row-cols-2 books">
-  <div class="col col-3">
-    Editeurs
-    <ul>
-      <li *ngFor="let editeur of editeurs">
-        <input type="checkbox" (click)="checkEditeur(editeur.nom)"/>
-        <label>{{editeur.nom}}</label>
-      </li>
-    </ul>
-    Genres
-    <ul>
-      <li *ngFor="let genre of genres">
-        <input type="checkbox" (click)="checkGenre(genre.nom)"/>
-        <label>{{genre.nom}}</label>
-      </li>
-    </ul>
-    Auteurs
-    <ul>
-      <li *ngFor="let auteur of auteurs">
-        <input type="checkbox" (click)="checkAuteur(auteur.nom)"/>
-        <label>{{auteur.nom}}</label>
-      </li>
-    </ul>
+<div class="row row-cols-2 page">
+  <div class="col col-4 d-flex flex-column categories">
+    <div class="m-auto">
+      <ul>
+        <li>
+          <input type="checkbox" [checked]="checked" (click)="checkAll()"/>
+          <label>Tous</label>
+        </li>
+      </ul>
+      Editeurs :
+      <ul>
+        <li *ngFor="let editeur of editeurs">
+          <input type="checkbox" [checked]="editeur.checked" (click)="checkEditeur(editeur.nom)"/>
+          <label>{{editeur.nom}}</label>
+        </li>
+      </ul>
+      Genres :
+      <ul>
+        <li *ngFor="let genre of genres">
+          <input type="checkbox" [checked]="genre.checked" (click)="checkGenre(genre.nom)"/>
+          <label>{{genre.nom}}</label>
+        </li>
+      </ul>
+      Auteurs :
+      <ul>
+        <li *ngFor="let auteur of auteurs">
+          <input type="checkbox" [checked]="auteur.checked" (click)="checkAuteur(auteur.nom)"/>
+          <label>{{auteur.nom}}</label>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div class="col col-9">
-    <div *ngFor="let book of getBooksFromService(); let index = index">
-      <div *ngIf="listeAll || editeursChecked[book.editeur.nom].checked ||
-                  testGenres(book.genres) ||
-                  auteursChecked[book.auteur.nom].checked" class="book-card">
-        <div class="book-id">
-          {{book.livre_id}}
-        </div>
-        <div class="book-infos">
-          <p class="m-0">Isbn : {{book.isbn}}</p>
-          <p class="m-0">Titre : {{book.titre}}</p>
-        </div>
-        <div class="book-icons">
-          <div  (click)="navigateTo(index)">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
-              <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
-            </svg>
+  <div class="col col-8 books">
+    <div class="">
+      <div *ngFor="let book of (getBooksFromService() | bookFilter:checked:editeurs:genres:auteurs:refresh); let index = index;"
+      class="card shadow book-card m-3 p-2">
+        <div class="d-flex flex-row">
+          <div class="p-2">
+            <p>{{book.titre}}</p>
           </div>
+          <div class="ms-auto me-2 book-icons">
+            <div  (click)="navigateTo(index)">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+                <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+              </svg>
+            </div>
+          </div>
+        </div>
+        <div class="p-2">
+          <p class="ms-5 mb-1">{{book.auteur.prenom}} {{book.auteur.nom}}</p>
         </div>
       </div>
     </div>

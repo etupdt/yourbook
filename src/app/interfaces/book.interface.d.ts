@@ -3,10 +3,10 @@ import { Editeur } from "./editeur.interface";
 import { Genre } from "./genre.interface";
 
 export interface Book {
-  livre_id?: number,
+  id?: number,
   isbn: string,
   titre: string,
   auteur: Auteur,
   editeur: Editeur,
-  genres: Genre[]
+  genres: {genre: Genre}[]
 }

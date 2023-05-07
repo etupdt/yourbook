@@ -5,7 +5,7 @@ import { Auteur } from 'src/app/interfaces/auteur.interface';
 import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
-import { environment } from 'src/environments/environment.development';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'

@@ -1,5 +1,6 @@
 
 export interface Genre {
-  id: number,
-  nom: string
+  id?: number,
+  nom: string,
+  checked?: boolean
 }

@@ -2,5 +2,6 @@
 export interface Auteur {
   id?: number,
   nom: string,
-  prenom: string
+  prenom: string,
+  checked?: boolean
 }

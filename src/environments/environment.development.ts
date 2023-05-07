@@ -1,4 +1,4 @@
 export const environment = {
-  production: true,
-  useBackend: 'https://www.etupdt.com:8443/api'
-}
+  production: false,
+  useBackend: 'http://localhost:8080/api'
+};

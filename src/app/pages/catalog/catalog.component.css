@@ -3,17 +3,16 @@
   padding-top: 105px;
   margin: auto;
   width: 55%;
-  min-width: 700px;
-  height: 77.7vh;
+  min-width: 1100px;
+  height: 85vh;
+  overflow-y: auto;
 }
 
 .categories {
-  height: 60vh;
+  height: 50vh;
 }
 
 .books {
-  overflow-y: auto;
-  height: 100%;
   padding: 0px;
 }
 
@@ -21,10 +20,41 @@
   border: 1px solid lightgrey;
 }
 
+.book-image {
+  height: 180px;
+}
+
+ul {
+  margin-bottom: 0;
+}
+
 li {
   list-style: none;
+  font-weight: 400;
+}
+
+span {
+  font-weight: 400;
+  margin-left: 6px;
 }
 
 label {
   padding-left: 8px;
+}
+
+.font-select {
+  font-weight: 600;
+  margin-left: 6px;
+}
+
+.svg.svg {
+  color: #aaaaaa;
+}
+
+.svg-select {
+  color: black;
+}
+
+input[type='checkbox'] {
+  accent-color: green;
 }

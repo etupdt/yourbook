@@ -6,6 +6,7 @@ import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
 import { HashTable } from 'src/app/interfaces/hashtable.interface';
 import { BookService } from 'src/app/services/book/book.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-catalog',
@@ -16,8 +17,12 @@ export class CatalogComponent {
 
   errorMessage: string = ''
 
+  imgBackend: string = environment.imgBackend
+
   checked: boolean = true
   refresh: number = 0
+  sortCategory: string = 'titre'
+  sortSense: number = 1
 
   editeurs!: Editeur[]
   editeursChecked: HashTable<Editeur> = {}
@@ -38,6 +43,13 @@ export class CatalogComponent {
 
   }
 
+  sortBy = (category: string) => {
+    if (this.sortCategory === category)
+      this.sortSense *= -1
+    else
+      this.sortCategory = category
+  }
+
   checkAll = () => {
     this.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
     this.genres.forEach((genre: Genre) => genre.checked = false)
@@ -46,20 +58,40 @@ export class CatalogComponent {
   }
 
   checkEditeur = (nom: string) => {
-    this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
+
     this.checked = false
     this.refresh++
   }
 
   checkGenre = (nom: string) => {
-    this.genresChecked[nom].checked = !this.genresChecked[nom].checked
+
     this.checked = false
     this.refresh++
   }
 
-  checkAuteur = (nom: string) => {
-    this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
-    this.checked = false
+  checkCategory = (category: string, nom: string) => {
+    switch (category) {
+      case 'editeur' : {
+        this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
+        break;
+      }
+      case 'genre' : {
+        this.genresChecked[nom].checked = !this.genresChecked[nom].checked
+        this.checked = false
+        break;
+      }
+      case 'auteur' : {
+        this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
+        this.checked = false
+        break;
+      }
+      default : {
+        this.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
+        this.genres.forEach((genre: Genre) => genre.checked = false)
+        this.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
+        this.checked = !this.checked
+      }
+    }
     this.refresh++
   }
 

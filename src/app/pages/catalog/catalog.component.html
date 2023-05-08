@@ -1,55 +1,116 @@
-<div class="row row-cols-2 page">
-  <div class="col col-4 d-flex flex-column categories">
-    <div class="m-auto">
-      <ul>
-        <li>
-          <input type="checkbox" [checked]="checked" (click)="checkAll()"/>
-          <label>Tous</label>
+<div class="page">
+  <div class="d-flex flex-row">
+    <nav aria-label="Page navigation example" class="row row-cols-2 d-flex flex-row w-100 my-3">
+      <div class="col col-3"></div>
+      <form class="col col-5 d-flex flex-row ps-4">
+        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+      </form>
+      <div class="col col-1"></div>
+      <ul class="col col-3 pagination justify-content-end pe-0">
+        <li class="page-item disabled">
+          <a class="page-link">Previous</a>
+        </li>
+        <li class="page-item"><a class="page-link" href="#">1</a></li>
+        <li class="page-item"><a class="page-link" href="#">2</a></li>
+        <li class="page-item"><a class="page-link" href="#">3</a></li>
+        <li class="page-item">
+          <a class="page-link" href="#">Next</a>
         </li>
       </ul>
-      Editeurs :
-      <ul>
-        <li *ngFor="let editeur of editeurs">
-          <input type="checkbox" [checked]="editeur.checked" (click)="checkEditeur(editeur.nom)"/>
-          <label>{{editeur.nom}}</label>
-        </li>
-      </ul>
-      Genres :
-      <ul>
-        <li *ngFor="let genre of genres">
-          <input type="checkbox" [checked]="genre.checked" (click)="checkGenre(genre.nom)"/>
-          <label>{{genre.nom}}</label>
-        </li>
-      </ul>
-      Auteurs :
-      <ul>
-        <li *ngFor="let auteur of auteurs">
-          <input type="checkbox" [checked]="auteur.checked" (click)="checkAuteur(auteur.nom)"/>
-          <label>{{auteur.nom}}</label>
-        </li>
-      </ul>
-    </div>
+    </nav>
   </div>
-  <div class="col col-8 books">
-    <div class="">
-      <div *ngFor="let book of (getBooksFromService() | bookFilter:checked:editeurs:genres:auteurs:refresh); let index = index;"
-      class="card shadow book-card m-3 p-2">
-        <div class="d-flex flex-row">
-          <div class="p-2">
-            <p>{{book.titre}}</p>
-          </div>
-          <div class="ms-auto me-2 book-icons">
-            <div  (click)="navigateTo(index)">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
-                <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-        <div class="p-2">
-          <p class="ms-5 mb-1">{{book.auteur.prenom}} {{book.auteur.nom}}</p>
+  <div class="row row-cols-2 mh-100">
+    <div class="col col-3 d-flex flex-column categories">
+      <div class="my-auto">
+        <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'titre', elements: [{nom: 'Tous'}], categorylibelle: 'Titre'}">
+        </ng-container>
+        <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'editeur', elements: editeurs, categorylibelle: 'Editeurs'}">
+        </ng-container>
+        <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'genre', elements: genres, categorylibelle: 'Genres'}">
+        </ng-container>
+        <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'auteur', elements: auteurs, categorylibelle: 'Auteurs'}">
+        </ng-container>
+      </div>
+    </div>
+    <div class="col col-9 books">
+      <div class="">
+        <div *ngFor="let book of (getBooksFromService() | bookFilter:checked:editeurs:genres:auteurs:sortCategory:sortSense:refresh)"
+          class="card shadow book-card m-3 me-4 p-2">
+          <ng-container [ngTemplateOutlet]="booktemplate" [ngTemplateOutletContext]="{book:book}"></ng-container>
         </div>
       </div>
     </div>
   </div>
 </div>
+
+<ng-template #categorytemplate let-category="category" let-elements="elements" let-categorylibelle="categorylibelle">
+  <div (click)="sortBy(category)" class="d-flex flex-row mt-3 mb-2">
+    <div [ngClass]="sortCategory === category ? 'svg-select' : 'svg'">
+      <ng-container *ngIf="sortCategory===category && sortSense === 1" [ngTemplateOutlet]="asc"></ng-container>
+      <ng-container *ngIf="sortCategory===category && sortSense === -1" [ngTemplateOutlet]="desc"></ng-container>
+      <ng-container *ngIf="sortCategory!==category" [ngTemplateOutlet]="aucun"></ng-container>
+    </div>
+    <span [ngClass]="sortCategory === category ? 'font-select' : ''" >{{categorylibelle}}</span>
+  </div>
+  <ul>
+    <li *ngFor="let element of elements" class="me-2">
+      <input type="checkbox" [checked]="element.checked" (click)="checkCategory(category, element.nom)"/>
+      <label>{{element.nom}}</label>
+    </li>
+  </ul>
+</ng-template>
+
+<ng-template #booktemplate let-book="book">
+  <div class="d-flex flex-row m-0">
+    <img class="book-image border border-4"
+    src="{{imgBackend}}/images/livres/{{book.image_name}}"
+    (click)="navigateTo(book.index)"
+    />
+    <div class="d-flex flex-row ms-4 w-100 mh-100">
+      <div class="d-flex flex-column p-2">
+        <h4 class="m-0">{{book.titre}}</h4>
+        <p class="mb-0"><b>{{book.auteur.prenom}} {{book.auteur.nom}}</b></p>
+        <div class="d-flex flex-row">
+          <div *ngFor="let genre of book.genres; let i = index;">
+            {{(i !== 0) ? '-' : ''}} {{genre.genre.nom}}&nbsp;</div>
+        </div>
+        <div class="mt-auto ps-3 pb-3">
+          <p class="mb-0">{{book.description.substring(0, 90)}} ...</p>
+        </div>
+      </div>
+      <div class="ms-auto me-2 book-icons">
+        <div (click)="navigateTo(book.index)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
+            <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #aucun>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-up" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M11.5 15a.5.5 0 0 0 .5-.5V2.707l3.146 3.147a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 1 0 .708.708L11 2.707V14.5a.5.5 0 0 0 .5.5zm-7-14a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L4 13.293V1.5a.5.5 0 0 1 .5-.5z"/>
+  </svg>
+</ng-template>
+
+<ng-template #asc>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-alpha-down" viewBox="0 0 16 16">
+    <path fill-rule="evenodd" d="M10.082 5.629 9.664 7H8.598l1.789-5.332h1.234L13.402 7h-1.12l-.419-1.371h-1.781zm1.57-.785L11 2.687h-.047l-.652 2.157h1.351z"/>
+    <path d="M12.96 14H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V14zM4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z"/>
+  </svg>
+  </ng-template>
+
+<ng-template #desc>
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-sort-alpha-down-alt" viewBox="0 0 16 16">
+    <path d="M12.96 7H9.028v-.691l2.579-3.72v-.054H9.098v-.867h3.785v.691l-2.567 3.72v.054h2.645V7z"/>
+    <path fill-rule="evenodd" d="M10.082 12.629 9.664 14H8.598l1.789-5.332h1.234L13.402 14h-1.12l-.419-1.371h-1.781zm1.57-.785L11 9.688h-.047l-.652 2.156h1.351z"/>
+    <path d="M4.5 2.5a.5.5 0 0 0-1 0v9.793l-1.146-1.147a.5.5 0 0 0-.708.708l2 1.999.007.007a.497.497 0 0 0 .7-.006l2-2a.5.5 0 0 0-.707-.708L4.5 12.293V2.5z"/>
+  </svg>
+</ng-template>

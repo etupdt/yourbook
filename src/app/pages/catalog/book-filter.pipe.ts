@@ -33,8 +33,13 @@ export class BookFilterPipe implements PipeTransform {
         this.categorieTypes['AUTEUR'].checkedNames.push(auteur.nom)
     })
 
+    let index = 0
+
     return books
       .filter(book => {
+
+        book.index = index
+        index++
 
         this.categorieTypes['EDITEUR'].otherSelected = this.categorieTypes['EDITEUR'].checkedNames.length > 0 && !this.categorieTypes['EDITEUR'].checkedNames.includes(book.editeur.nom)
         this.categorieTypes['GENRES'].otherSelected = this.categorieTypes['GENRES'].checkedNames.length > 0 && !(book.genres.filter(genre => this.categorieTypes['GENRES'].checkedNames.includes(genre.genre.nom)).length > 0)
@@ -42,6 +47,14 @@ export class BookFilterPipe implements PipeTransform {
 
         return checks[0] || this.isBookSelected(['EDITEUR', 'GENRES', 'AUTEUR'])
 
+      })
+      .sort((a: Book, b: Book) => {
+        switch (checks[4]) {
+          case 'editeur' : return a.editeur.nom.localeCompare(b.editeur.nom) * checks[5]
+          case 'genre' : return a.genres[0].genre.nom.localeCompare(b.genres[0].genre.nom) * checks[5]
+          case 'auteur' : return a.auteur.nom.localeCompare(b.auteur.nom) * checks[5]
+          default : return a.titre.toUpperCase().localeCompare(b.titre.toUpperCase()) * checks[5]
+        }
       })
 
   }

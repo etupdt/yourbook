@@ -1,21 +1,32 @@
 <div class="page">
-  <div class="card shadow book-card">
+  <div class="card shadow d-flex flex-row book-card">
+    <div class="m-4">
+      <ul>
+        <li *ngFor="let genre of book.genres">
+          toto
+        </li>
+      </ul>
+      <img class="book-image border"
+        src="{{imgBackend}}/images/livres/{{book.image_name}}"
+      />
+    </div>
+    <div class="m-4">
 
-    <h1>{{book.titre}}</h1>
+      <h1>{{book.titre}}</h1>
 
-    <p>{{book.id}}</p>
+      <h2>{{book.auteur.prenom}} {{book.auteur.nom}}</h2>
 
-    <p>{{book.isbn}}</p>
+      <p>Edition : {{book.editeur.nom}}</p>
 
-    <p>{{book.auteur.prenom}} {{book.auteur.nom}}</p>
+      <div class="mt-5">
+        <p>Réf : {{book.id}}</p>
+        <p>Réf. ISBN : {{book.isbn}}</p>
+      </div>
 
-    <ul>
-      <li *ngFor="let genre of book.genres">
-        {{genre.genre.nom}}
-      </li>
-    </ul>
+      <p class="mt-5">
+        {{book.description}}
+      </p>
 
-    <p>{{book.editeur.nom}}</p>
-
+    </div>
   </div>
 </div>

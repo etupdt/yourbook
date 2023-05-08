@@ -15,6 +15,7 @@ export class BookService implements OnInit{
   book: Book = {
     id: 0,
     isbn: '',
+    description: '',
     titre: '',
     auteur: {
       id: 0,
@@ -25,6 +26,7 @@ export class BookService implements OnInit{
       id: 0,
       nom: ''
     },
+    image_name: '',
     genres: []
   }
 

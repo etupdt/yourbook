@@ -4,7 +4,7 @@
   padding-bottom: 20px;
   margin: auto;
   width: 40%;
-  min-width: 700px;
+  min-width: 1000px;
   height: 77.7vh;
 }
 
@@ -12,3 +12,13 @@
   border: 1px solid lightgrey;
   height: 100%;
 }
+
+.book-image {
+  height: 600px;
+}
+
+h1 {
+  font-size: 50px;
+  font-weight: bolder;
+}
+

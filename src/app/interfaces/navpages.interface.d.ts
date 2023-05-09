@@ -1,8 +1,8 @@
 
 export interface NavPages {
-  numPage: number,
-  nbRowByPage: number,
+  numberPages: number,
   navFirst: number,
   navNumber: number,
-  navPos: number
+  nbRowByPage: number,
+  numPage: number
 }

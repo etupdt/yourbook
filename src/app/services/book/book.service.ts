@@ -5,6 +5,7 @@ import { Auteur } from 'src/app/interfaces/auteur.interface';
 import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
+import { NavPages } from 'src/app/interfaces/navpages.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -33,6 +34,14 @@ export class BookService implements OnInit{
   editeurs: Editeur[] = []
   genres: Genre[] = []
   auteurs: Auteur[] = []
+
+  pages: NavPages = {
+    numberPages: 0,
+    navFirst: 0,
+    navNumber: 1,
+    nbRowByPage: 0,
+    numPage: 0
+  }
 
   modified = false
 

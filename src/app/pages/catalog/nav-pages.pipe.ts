@@ -1,33 +1,31 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { NavPages } from 'src/app/interfaces/navpages.interface';
+import { BookService } from 'src/app/services/book/book.service';
 
 @Pipe({
   name: 'navPages'
 })
 export class NavPagesPipe implements PipeTransform {
 
-  transform(navpages: NavPages, ...numbers: any[]): number [] {
+  constructor (
+    private bookService: BookService
+  ) {}
 
-    console.log(navpages)
-    const nbPages = this.numberPages(numbers[0], navpages.nbRowByPage)
+  transform(refresh: number, ...numbers: any[]): number [] {
 
-    navpages.navFirst = Math.max(0, navpages.numPage - navpages.navNumber)
+    console.log('pipe pages')
+
+    this.bookService.pages.navFirst = Math.max(0, this.bookService.pages.numPage - this.bookService.pages.navNumber)
 
     let array: number[] = []
 
     for (
-      let i: number = navpages.navFirst;
-      i < Math.min(nbPages, navpages.numPage + navpages.navNumber + 1);
+      let i: number = this.bookService.pages.navFirst;
+      i < Math.min(this.bookService.pages.numberPages, this.bookService.pages.numPage + this.bookService.pages.navNumber + 1);
       i++
     ) array.push(i)
 
     return array
 
-  }
-
-  numberPages = (nbBooks: number, nbRowByPage: number) => {
-    const numberPage = nbBooks % nbRowByPage > 0 ? 1 : 0
-    return Math.floor(nbBooks / nbRowByPage) + numberPage
   }
 
 }

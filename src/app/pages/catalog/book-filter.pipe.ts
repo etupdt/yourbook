@@ -4,17 +4,24 @@ import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
 import { HashTable } from 'src/app/interfaces/hashtable.interface';
+import { BookService } from 'src/app/services/book/book.service';
 
 @Pipe({
   name: 'bookFilter'
 })
 export class BookFilterPipe implements PipeTransform {
 
+  constructor (
+    private bookService: BookService
+  ) {}
+
   editeursChecked: HashTable<Editeur> = {}
 
   categorieTypes: HashTable<{otherSelected: boolean, checkedNames: string[]}> = {}
 
   transform(books: Book[], ...checks: any[]): Book[] {
+
+    console.log('pipe filter')
 
     const checked = checks[0].checked
     const editeurs = checks[0].editeurs
@@ -25,8 +32,8 @@ export class BookFilterPipe implements PipeTransform {
     const sortCategory = checks[1].sortCategory
     const sortSense = checks[1].sortSense
 
-    const numPage = checks[2].numPage
-    const nbRowByPage = checks[2].nbRowByPage
+    const numPage = this.bookService.pages.numPage
+    const nbRowByPage = this.bookService.pages.nbRowByPage
 
     this.categorieTypes['EDITEUR'] = {otherSelected: false, checkedNames: []}
     this.categorieTypes['GENRES'] = {otherSelected: false, checkedNames: []}
@@ -84,6 +91,9 @@ export class BookFilterPipe implements PipeTransform {
       }
     })
 
+    const numberPage = booksOut.length % nbRowByPage > 0 ? 1 : 0
+    this.bookService.pages.numberPages = Math.floor(booksOut.length / nbRowByPage) + numberPage
+    console.log(booksOut)
     return booksOut.slice(numPage * nbRowByPage, (numPage + 1) * nbRowByPage)
 
   }

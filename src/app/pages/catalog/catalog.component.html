@@ -10,17 +10,17 @@
       </form>
       <div class="col col-1"></div>
       <ul class="col col-3 pagination pe-0 justify-content-end">
-        <li class="page-item {{pages.numPage > 0 ? '' : 'disabled'}}"
-        (click)="managePage(pages.numPage - 1)"><a class="page-link">Previous</a></li>
-        <li *ngFor="let page of (pages | navPages:getBooksFromService().length:refresh)"
+        <li class="page-item {{getNumPage() > 0 ? '' : 'disabled'}}"
+        (click)="managePage(getNumPage() - 1)"><a class="page-link">Previous</a></li>
+        <li *ngFor="let page of (refreshFilter | navPages)"
           class="page-item"><a
-          class="page-link {{pages.numPage === page ? 'num-page-selected' : ''}}"
+          class="page-link {{getNumPage() === page ? 'num-page-selected' : ''}}"
           (click)="managePage(page)">{{page + 1}}</a></li>
-        <li class="page-item {{pages.numPage < numberPages() - 1 ? '' : 'disabled'}}"
-          (click)="managePage(pages.numPage + 1)"><a class="page-link">Next</a></li>
-        <li class="page-item" (change)="refresh = refresh + 1">
+        <li class="page-item {{getNumPage() < getNumberPages() - 1 ? '' : 'disabled'}}"
+          (click)="managePage(getNumPage() + 1)"><a class="page-link">Next</a></li>
+        <li class="page-item" (change)="refreshFilter = refreshFilter + 1">
           <form>
-            <input class="form-control row-per-page" type="number" (change)="pages.nbRowByPage = pages.nbRowByPage < 0 ? 0 : pages.nbRowByPage" [(ngModel)]="pages.nbRowByPage">
+            <input class="form-control row-per-page" type="number" (change)="setNbRowByPage()" [(ngModel)]="nbRowByPage">
           </form>
         </li>
       </ul>
@@ -46,7 +46,7 @@
       </div>
       <div class="col col-9 p-0 m-0 ">
         <div class="">
-          <div *ngFor="let book of (getBooksFromService() | bookFilter:filters:sorts:pages:refresh)"
+          <div *ngFor="let book of (getBooksFromService() | bookFilter:filters:sorts:refreshFilter)"
             class="card shadow book-card mb-3 p-2">
             <ng-container [ngTemplateOutlet]="booktemplate" [ngTemplateOutletContext]="{book:book}"></ng-container>
           </div>

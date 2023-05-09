@@ -33,8 +33,10 @@ export class CatalogComponent {
 
   imgBackend: string = environment.imgBackend
 
-  refresh: number = 0
+  refreshFilter: number = 0
   searchValue: string = ''
+
+  nbRowByPage: number = 4
 
   editeursChecked: HashTable<Editeur> = {}
   genresChecked: HashTable<Genre> = {}
@@ -53,14 +55,6 @@ export class CatalogComponent {
     sortSense: 1
   }
 
-  pages: NavPages = {
-    numPage: 0,
-    nbRowByPage: 2,
-    navFirst: 0,
-    navNumber: 1,
-    navPos: 0
-  }
-
   constructor (
     private bookService: BookService,
     private router: Router
@@ -74,7 +68,9 @@ export class CatalogComponent {
   }
 
   searchBooks = () => {
+    this.bookService.pages.numPage = 0
     this.filters.searchString = this.searchValue
+    this.refreshFilter++
   }
 
   sortBy = (category: string) => {
@@ -85,8 +81,9 @@ export class CatalogComponent {
       this.sorts.sortCategory = category
       this.sorts.sortSense = 1
     }
+    this.bookService.pages.numPage = 0
     this.filters.searchString = this.searchValue
-    this.refresh++
+    this.refreshFilter++
   }
 
   checkCategory = (category: string, nom: string) => {
@@ -113,8 +110,9 @@ export class CatalogComponent {
         this.filters.checked = !this.filters.checked
       }
     }
+    this.bookService.pages.numPage = 0
     this.filters.searchString = this.searchValue
-    this.refresh++
+    this.refreshFilter++
   }
 
   navigateTo = (index?: Number) => {
@@ -217,18 +215,36 @@ export class CatalogComponent {
       this.auteursChecked[element.nom] = element
     });
 
+    this.refreshFilter++
+    this.setNbRowByPage()
+
   }
 
   managePage = (page: number) => {
-    if (page >= 0 && page < this.numberPages()) {
-      this.pages.numPage = page
-      this.refresh++
+    if (page >= 0 && page < this.bookService.pages.numberPages) {
+      this.bookService.pages.numPage = page
+      this.refreshFilter++
     }
   }
 
-  numberPages = () => {
-    const numberPage = this.getBooksFromService().length % this.pages.nbRowByPage > 0 ? 1 : 0
-    return Math.floor(this.getBooksFromService().length / this.pages.nbRowByPage) + numberPage
+  setNbRowByPage = () => {
+    if (this.nbRowByPage < 1)
+      this.bookService.pages.nbRowByPage = 1
+    else
+      this.bookService.pages.nbRowByPage = this.nbRowByPage
+    this.bookService.pages.numPage = 0
+  }
+
+  getNumberPages = () => {
+    return this.bookService.pages.numberPages
+  }
+
+  getNumPage = () => {
+    return this.bookService.pages.numPage
+  }
+
+  getNbRowByPage = () => {
+    return this.bookService.pages.nbRowByPage
   }
 
 }

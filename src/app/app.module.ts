@@ -21,6 +21,8 @@ import { ContactComponent } from './pages/contact/contact.component';
 import { LoginComponent } from './pages/login/login.component';
 import { HttpClientModule } from '@angular/common/http';
 import { BookFilterPipe } from './pages/catalog/book-filter.pipe';
+import { FormsModule } from '@angular/forms';
+import { NavPagesPipe } from './pages/catalog/nav-pages.pipe';
 
 @NgModule({
   declarations: [
@@ -41,12 +43,14 @@ import { BookFilterPipe } from './pages/catalog/book-filter.pipe';
     AboutComponent,
     ContactComponent,
     LoginComponent,
-    BookFilterPipe
+    BookFilterPipe,
+    NavPagesPipe
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
-    HttpClientModule
+    HttpClientModule,
+    FormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

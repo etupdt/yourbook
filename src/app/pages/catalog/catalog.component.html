@@ -1,47 +1,55 @@
 <div class="page">
-  <div class="d-flex flex-row">
-    <nav aria-label="Page navigation example" class="row row-cols-2 d-flex flex-row w-100 my-3">
-      <div class="col col-3"></div>
-      <form class="col col-5 d-flex flex-row ps-4">
-        <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+  <div class="row row-cols-2 books">
+    <div class="col col-3"></div>
+    <div aria-label="Page navigation example" class="col col-9 d-flex flex-row w-100 mt-5 mb-3 mx-0">
+      <div class="col col-3 p-0"></div>
+      <form class="col col-5 d-flex flex-row p-0">
+        <input class="form-control mr-sm-2" [(ngModel)]="searchValue"
+        type="text" placeholder="Search" aria-label="Search" id="search">
+        <button class="btn btn-outline-success my-2 my-sm-0" (click)="searchBooks()">Search</button>
       </form>
       <div class="col col-1"></div>
-      <ul class="col col-3 pagination justify-content-end pe-0">
-        <li class="page-item disabled">
-          <a class="page-link">Previous</a>
-        </li>
-        <li class="page-item"><a class="page-link" href="#">1</a></li>
-        <li class="page-item"><a class="page-link" href="#">2</a></li>
-        <li class="page-item"><a class="page-link" href="#">3</a></li>
-        <li class="page-item">
-          <a class="page-link" href="#">Next</a>
+      <ul class="col col-3 pagination pe-0 justify-content-end">
+        <li class="page-item {{pages.numPage > 0 ? '' : 'disabled'}}"
+        (click)="managePage(pages.numPage - 1)"><a class="page-link">Previous</a></li>
+        <li *ngFor="let page of (pages | navPages:getBooksFromService().length:refresh)"
+          class="page-item"><a
+          class="page-link {{pages.numPage === page ? 'num-page-selected' : ''}}"
+          (click)="managePage(page)">{{page + 1}}</a></li>
+        <li class="page-item {{pages.numPage < numberPages() - 1 ? '' : 'disabled'}}"
+          (click)="managePage(pages.numPage + 1)"><a class="page-link">Next</a></li>
+        <li class="page-item" (change)="refresh = refresh + 1">
+          <form>
+            <input class="form-control row-per-page" type="number" (change)="pages.nbRowByPage = pages.nbRowByPage < 0 ? 0 : pages.nbRowByPage" [(ngModel)]="pages.nbRowByPage">
+          </form>
         </li>
       </ul>
-    </nav>
-  </div>
-  <div class="row row-cols-2 mh-100">
-    <div class="col col-3 d-flex flex-column categories">
-      <div class="my-auto">
-        <ng-container [ngTemplateOutlet]="categorytemplate"
-          [ngTemplateOutletContext]="{category: 'titre', elements: [{nom: 'Tous'}], categorylibelle: 'Titre'}">
-        </ng-container>
-        <ng-container [ngTemplateOutlet]="categorytemplate"
-          [ngTemplateOutletContext]="{category: 'editeur', elements: editeurs, categorylibelle: 'Editeurs'}">
-        </ng-container>
-        <ng-container [ngTemplateOutlet]="categorytemplate"
-          [ngTemplateOutletContext]="{category: 'genre', elements: genres, categorylibelle: 'Genres'}">
-        </ng-container>
-        <ng-container [ngTemplateOutlet]="categorytemplate"
-          [ngTemplateOutletContext]="{category: 'auteur', elements: auteurs, categorylibelle: 'Auteurs'}">
-        </ng-container>
-      </div>
     </div>
-    <div class="col col-9 books">
-      <div class="">
-        <div *ngFor="let book of (getBooksFromService() | bookFilter:checked:editeurs:genres:auteurs:sortCategory:sortSense:refresh)"
-          class="card shadow book-card m-3 me-4 p-2">
-          <ng-container [ngTemplateOutlet]="booktemplate" [ngTemplateOutletContext]="{book:book}"></ng-container>
+  </div>
+  <div class="div-books">
+    <div class="row row-cols-2 books">
+      <div class="col col-3 d-flex flex-column mt-5">
+        <div class="my-auto categories">
+          <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'titre', elements: [{nom: 'Tous'}], categorylibelle: 'Titre'}">
+          </ng-container>
+          <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'editeur', elements: filters.editeurs, categorylibelle: 'Editeurs'}">
+          </ng-container>
+          <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'genre', elements: filters.genres, categorylibelle: 'Genres'}">
+          </ng-container>
+          <ng-container [ngTemplateOutlet]="categorytemplate"
+          [ngTemplateOutletContext]="{category: 'auteur', elements: filters.auteurs, categorylibelle: 'Auteurs'}">
+          </ng-container>
+        </div>
+      </div>
+      <div class="col col-9 p-0 m-0 ">
+        <div class="">
+          <div *ngFor="let book of (getBooksFromService() | bookFilter:filters:sorts:pages:refresh)"
+            class="card shadow book-card mb-3 p-2">
+            <ng-container [ngTemplateOutlet]="booktemplate" [ngTemplateOutletContext]="{book:book}"></ng-container>
+          </div>
         </div>
       </div>
     </div>
@@ -50,16 +58,16 @@
 
 <ng-template #categorytemplate let-category="category" let-elements="elements" let-categorylibelle="categorylibelle">
   <div (click)="sortBy(category)" class="d-flex flex-row mt-3 mb-2">
-    <div [ngClass]="sortCategory === category ? 'svg-select' : 'svg'">
-      <ng-container *ngIf="sortCategory===category && sortSense === 1" [ngTemplateOutlet]="asc"></ng-container>
-      <ng-container *ngIf="sortCategory===category && sortSense === -1" [ngTemplateOutlet]="desc"></ng-container>
-      <ng-container *ngIf="sortCategory!==category" [ngTemplateOutlet]="aucun"></ng-container>
+    <div [ngClass]="sorts.sortCategory === category ? 'svg-select' : 'svg'">
+      <ng-container *ngIf="sorts.sortCategory===category && sorts.sortSense === 1" [ngTemplateOutlet]="asc"></ng-container>
+      <ng-container *ngIf="sorts.sortCategory===category && sorts.sortSense === -1" [ngTemplateOutlet]="desc"></ng-container>
+      <ng-container *ngIf="sorts.sortCategory!==category" [ngTemplateOutlet]="aucun"></ng-container>
     </div>
-    <span [ngClass]="sortCategory === category ? 'font-select' : ''" >{{categorylibelle}}</span>
+    <span [ngClass]="sorts.sortCategory === category ? 'font-select' : ''" >{{categorylibelle}}</span>
   </div>
   <ul>
     <li *ngFor="let element of elements" class="me-2">
-      <input type="checkbox" [checked]="element.checked" (click)="checkCategory(category, element.nom)"/>
+      <input type="checkbox" [checked]="category === 'titre' ? filters.checked : element.checked" (click)="checkCategory(category, element.nom)"/>
       <label>{{element.nom}}</label>
     </li>
   </ul>
@@ -67,11 +75,11 @@
 
 <ng-template #booktemplate let-book="book">
   <div class="d-flex flex-row m-0">
-    <img class="book-image border border-4"
+    <img class="book-image border border-4 m-2"
     src="{{imgBackend}}/images/livres/{{book.image_name}}"
     (click)="navigateTo(book.index)"
     />
-    <div class="d-flex flex-row ms-4 w-100 mh-100">
+    <div class="d-flex flex-row m-0 w-100 mh-100">
       <div class="d-flex flex-column p-2">
         <h4 class="m-0">{{book.titre}}</h4>
         <p class="mb-0"><b>{{book.auteur.prenom}} {{book.auteur.nom}}</b></p>
@@ -80,7 +88,7 @@
             {{(i !== 0) ? '-' : ''}} {{genre.genre.nom}}&nbsp;</div>
         </div>
         <div class="mt-auto ps-3 pb-3">
-          <p class="mb-0">{{book.description.substring(0, 90)}} ...</p>
+          <p class="mb-0">{{book.description.substring(0, 160)}} ...</p>
         </div>
       </div>
       <div class="ms-auto me-2 book-icons">

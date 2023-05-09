@@ -16,46 +16,75 @@ export class BookFilterPipe implements PipeTransform {
 
   transform(books: Book[], ...checks: any[]): Book[] {
 
+    const checked = checks[0].checked
+    const editeurs = checks[0].editeurs
+    const genres = checks[0].genres
+    const auteurs = checks[0].auteurs
+    const searchString = checks[0].searchString
+
+    const sortCategory = checks[1].sortCategory
+    const sortSense = checks[1].sortSense
+
+    const numPage = checks[2].numPage
+    const nbRowByPage = checks[2].nbRowByPage
+
     this.categorieTypes['EDITEUR'] = {otherSelected: false, checkedNames: []}
     this.categorieTypes['GENRES'] = {otherSelected: false, checkedNames: []}
     this.categorieTypes['AUTEUR'] = {otherSelected: false, checkedNames: []}
 
-    checks[1].forEach((editeur: Editeur) => {
+    editeurs.forEach((editeur: Editeur) => {
       if (editeur.checked)
         this.categorieTypes['EDITEUR'].checkedNames.push(editeur.nom)
     })
-    checks[2].forEach((genre: Genre) => {
+    genres.forEach((genre: Genre) => {
       if (genre.checked)
         this.categorieTypes['GENRES'].checkedNames.push(genre.nom)
     })
-    checks[3].forEach((auteur: Auteur) => {
+    auteurs.forEach((auteur: Auteur) => {
       if (auteur.checked)
         this.categorieTypes['AUTEUR'].checkedNames.push(auteur.nom)
     })
 
     let index = 0
 
-    return books
+    const booksOut = books
+      .filter(book => {
+        let retour = false
+        if (searchString === '' ||
+          book.titre.toLowerCase().indexOf(searchString) >= 0 ||
+          book.isbn.toLowerCase().indexOf(searchString) >= 0 ||
+          book.editeur.nom.toLowerCase().indexOf(searchString) >= 0 ||
+          book.titre.toLowerCase().indexOf(searchString) >= 0 ||
+          book.auteur.prenom.toLowerCase().indexOf(searchString) >= 0 ||
+          book.auteur.nom.toLowerCase().indexOf(searchString) >= 0)
+          retour = true
+        book.genres.forEach(genre => {
+          retour = retour || genre.genre.nom.toLowerCase().indexOf(searchString) >= 0
+        })
+        return retour
+      })
       .filter(book => {
 
-        book.index = index
-        index++
+      book.index = index
+      index++
 
-        this.categorieTypes['EDITEUR'].otherSelected = this.categorieTypes['EDITEUR'].checkedNames.length > 0 && !this.categorieTypes['EDITEUR'].checkedNames.includes(book.editeur.nom)
-        this.categorieTypes['GENRES'].otherSelected = this.categorieTypes['GENRES'].checkedNames.length > 0 && !(book.genres.filter(genre => this.categorieTypes['GENRES'].checkedNames.includes(genre.genre.nom)).length > 0)
-        this.categorieTypes['AUTEUR'].otherSelected = (this.categorieTypes['AUTEUR'].checkedNames.length > 0) && (!this.categorieTypes['AUTEUR'].checkedNames.includes(book.auteur.nom))
+      this.categorieTypes['EDITEUR'].otherSelected = this.categorieTypes['EDITEUR'].checkedNames.length > 0 && !this.categorieTypes['EDITEUR'].checkedNames.includes(book.editeur.nom)
+      this.categorieTypes['GENRES'].otherSelected = this.categorieTypes['GENRES'].checkedNames.length > 0 && !(book.genres.filter(genre => this.categorieTypes['GENRES'].checkedNames.includes(genre.genre.nom)).length > 0)
+      this.categorieTypes['AUTEUR'].otherSelected = (this.categorieTypes['AUTEUR'].checkedNames.length > 0) && (!this.categorieTypes['AUTEUR'].checkedNames.includes(book.auteur.nom))
 
-        return checks[0] || this.isBookSelected(['EDITEUR', 'GENRES', 'AUTEUR'])
+      return checked || this.isBookSelected(['EDITEUR', 'GENRES', 'AUTEUR'])
 
-      })
-      .sort((a: Book, b: Book) => {
-        switch (checks[4]) {
-          case 'editeur' : return a.editeur.nom.localeCompare(b.editeur.nom) * checks[5]
-          case 'genre' : return a.genres[0].genre.nom.localeCompare(b.genres[0].genre.nom) * checks[5]
-          case 'auteur' : return a.auteur.nom.localeCompare(b.auteur.nom) * checks[5]
-          default : return a.titre.toUpperCase().localeCompare(b.titre.toUpperCase()) * checks[5]
-        }
-      })
+    })
+    .sort((a: Book, b: Book) => {
+      switch (sortCategory) {
+        case 'editeur' : return a.editeur.nom.localeCompare(b.editeur.nom) * sortSense
+        case 'genre' : return a.genres[0].genre.nom.localeCompare(b.genres[0].genre.nom) * sortSense
+        case 'auteur' : return a.auteur.nom.localeCompare(b.auteur.nom) * sortSense
+        default : return a.titre.toUpperCase().localeCompare(b.titre.toUpperCase()) * sortSense
+      }
+    })
+
+    return booksOut.slice(numPage * nbRowByPage, (numPage + 1) * nbRowByPage)
 
   }
 

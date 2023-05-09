@@ -5,8 +5,22 @@ import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
 import { HashTable } from 'src/app/interfaces/hashtable.interface';
+import { NavPages } from 'src/app/interfaces/navpages.interface';
 import { BookService } from 'src/app/services/book/book.service';
 import { environment } from 'src/environments/environment';
+
+interface Filters {
+  checked: boolean,
+  searchString: string,
+  editeurs: Editeur[],
+  genres: Genre[],
+  auteurs: Auteur[]
+}
+
+interface Sorts {
+  sortCategory: string,
+  sortSense: number
+}
 
 @Component({
   selector: 'app-catalog',
@@ -19,17 +33,33 @@ export class CatalogComponent {
 
   imgBackend: string = environment.imgBackend
 
-  checked: boolean = true
   refresh: number = 0
-  sortCategory: string = 'titre'
-  sortSense: number = 1
+  searchValue: string = ''
 
-  editeurs!: Editeur[]
   editeursChecked: HashTable<Editeur> = {}
-  genres!: Genre[]
   genresChecked: HashTable<Genre> = {}
-  auteurs!: Auteur[]
   auteursChecked: HashTable<Auteur> = {}
+
+  filters: Filters = {
+    checked: true,
+    searchString: '',
+    editeurs: [],
+    genres: [],
+    auteurs: []
+  }
+
+  sorts: Sorts = {
+    sortCategory: 'titre',
+    sortSense: 1
+  }
+
+  pages: NavPages = {
+    numPage: 0,
+    nbRowByPage: 2,
+    navFirst: 0,
+    navNumber: 1,
+    navPos: 0
+  }
 
   constructor (
     private bookService: BookService,
@@ -43,29 +73,19 @@ export class CatalogComponent {
 
   }
 
+  searchBooks = () => {
+    this.filters.searchString = this.searchValue
+  }
+
   sortBy = (category: string) => {
-    if (this.sortCategory === category)
-      this.sortSense *= -1
-    else
-      this.sortCategory = category
-  }
-
-  checkAll = () => {
-    this.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
-    this.genres.forEach((genre: Genre) => genre.checked = false)
-    this.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
-    this.checked = !this.checked
-  }
-
-  checkEditeur = (nom: string) => {
-
-    this.checked = false
-    this.refresh++
-  }
-
-  checkGenre = (nom: string) => {
-
-    this.checked = false
+    if (this.sorts.sortCategory === category) {
+      this.sorts.sortSense *= -1
+    }
+    else {
+      this.sorts.sortCategory = category
+      this.sorts.sortSense = 1
+    }
+    this.filters.searchString = this.searchValue
     this.refresh++
   }
 
@@ -73,25 +93,27 @@ export class CatalogComponent {
     switch (category) {
       case 'editeur' : {
         this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
+        this.filters.checked = false
         break;
       }
       case 'genre' : {
         this.genresChecked[nom].checked = !this.genresChecked[nom].checked
-        this.checked = false
+        this.filters.checked = false
         break;
       }
       case 'auteur' : {
         this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
-        this.checked = false
+        this.filters.checked = false
         break;
       }
       default : {
-        this.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
-        this.genres.forEach((genre: Genre) => genre.checked = false)
-        this.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
-        this.checked = !this.checked
+        this.filters.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
+        this.filters.genres.forEach((genre: Genre) => genre.checked = false)
+        this.filters.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
+        this.filters.checked = !this.filters.checked
       }
     }
+    this.filters.searchString = this.searchValue
     this.refresh++
   }
 
@@ -178,23 +200,35 @@ export class CatalogComponent {
 
   initTemplate = () => {
 
-    this.editeurs = this.bookService.editeurs
+    this.filters.editeurs = this.bookService.editeurs
     this.bookService.editeurs.forEach(element => {
       element.checked = false
       this.editeursChecked[element.nom] = element
     });
-    console.log(this.editeurs)
-    this.genres = this.bookService.genres
+    console.log(this.filters.editeurs)
+    this.filters.genres = this.bookService.genres
     this.bookService.genres.forEach(element => {
       element.checked = false
       this.genresChecked[element.nom] = element
     });
-    this.auteurs = this.bookService.auteurs
+    this.filters.auteurs = this.bookService.auteurs
     this.bookService.auteurs.forEach(element => {
       element.checked = false
       this.auteursChecked[element.nom] = element
     });
 
+  }
+
+  managePage = (page: number) => {
+    if (page >= 0 && page < this.numberPages()) {
+      this.pages.numPage = page
+      this.refresh++
+    }
+  }
+
+  numberPages = () => {
+    const numberPage = this.getBooksFromService().length % this.pages.nbRowByPage > 0 ? 1 : 0
+    return Math.floor(this.getBooksFromService().length / this.pages.nbRowByPage) + numberPage
   }
 
 }

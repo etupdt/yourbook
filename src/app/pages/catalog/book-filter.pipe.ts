@@ -21,16 +21,14 @@ export class BookFilterPipe implements PipeTransform {
 
   transform(books: Book[], ...checks: any[]): Book[] {
 
-    console.log('pipe filter')
+    const checked = this.bookService.filters.checked
+    const editeurs = this.bookService.filters.editeurs
+    const genres = this.bookService.filters.genres
+    const auteurs = this.bookService.filters.auteurs
+    const searchString = this.bookService.filters.searchString
 
-    const checked = checks[0].checked
-    const editeurs = checks[0].editeurs
-    const genres = checks[0].genres
-    const auteurs = checks[0].auteurs
-    const searchString = checks[0].searchString
-
-    const sortCategory = checks[1].sortCategory
-    const sortSense = checks[1].sortSense
+    const sortCategory = this.bookService.sorts.sortCategory
+    const sortSense = this.bookService.sorts.sortSense
 
     const numPage = this.bookService.pages.numPage
     const nbRowByPage = this.bookService.pages.nbRowByPage
@@ -93,7 +91,12 @@ export class BookFilterPipe implements PipeTransform {
 
     const numberPage = booksOut.length % nbRowByPage > 0 ? 1 : 0
     this.bookService.pages.numberPages = Math.floor(booksOut.length / nbRowByPage) + numberPage
-    console.log(booksOut)
+    console.log('pipe filter', this.bookService.pages.numberPages, numberPage, nbRowByPage, nbRowByPage)
+
+    this.bookService.pages.navFirst = Math.max(0, this.bookService.pages.numPage - this.bookService.pages.navNumber)
+    this.bookService.pages.refreshPages++
+    this.bookService.refreshPages.next(this.bookService.pages.refreshPages)
+
     return booksOut.slice(numPage * nbRowByPage, (numPage + 1) * nbRowByPage)
 
   }

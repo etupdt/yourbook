@@ -1,11 +1,13 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, ObservableInput, Observer, from } from 'rxjs';
 import { Auteur } from 'src/app/interfaces/auteur.interface';
 import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
+import { Filters } from 'src/app/interfaces/filters.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
 import { NavPages } from 'src/app/interfaces/navpages.interface';
+import { Sorts } from 'src/app/interfaces/sorts.interface';
 import { environment } from 'src/environments/environment';
 
 @Injectable({
@@ -35,13 +37,30 @@ export class BookService implements OnInit{
   genres: Genre[] = []
   auteurs: Auteur[] = []
 
+  filters: Filters = {
+    checked: true,
+    searchString: '',
+    editeurs: [],
+    genres: [],
+    auteurs: [],
+    refreshFilters: 0
+  }
+
+  sorts: Sorts = {
+    sortCategory: 'titre',
+    sortSense: 1
+  }
+
   pages: NavPages = {
     numberPages: 0,
     navFirst: 0,
     navNumber: 1,
-    nbRowByPage: 0,
-    numPage: 0
+    nbRowByPage: 4,
+    numPage: 0,
+    refreshPages: 0
   }
+
+  refreshPages!: Observer<number>
 
   modified = false
 

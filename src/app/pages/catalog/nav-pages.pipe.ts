@@ -10,21 +10,11 @@ export class NavPagesPipe implements PipeTransform {
     private bookService: BookService
   ) {}
 
-  transform(refresh: number, ...numbers: any[]): number [] {
+  transform(pages: number[], ...numbers: any[]): number[] {
 
-    console.log('pipe pages')
+      console.log('pipe pages', pages)
 
-    this.bookService.pages.navFirst = Math.max(0, this.bookService.pages.numPage - this.bookService.pages.navNumber)
-
-    let array: number[] = []
-
-    for (
-      let i: number = this.bookService.pages.navFirst;
-      i < Math.min(this.bookService.pages.numberPages, this.bookService.pages.numPage + this.bookService.pages.navNumber + 1);
-      i++
-    ) array.push(i)
-
-    return array
+    return pages
 
   }
 

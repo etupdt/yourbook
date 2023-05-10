@@ -1,26 +1,13 @@
-import { Component } from '@angular/core';
+import { ChangeDetectorRef, Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { Observable, Subscribable, Subscription, from } from 'rxjs';
 import { Auteur } from 'src/app/interfaces/auteur.interface';
 import { Book } from 'src/app/interfaces/book.interface';
 import { Editeur } from 'src/app/interfaces/editeur.interface';
 import { Genre } from 'src/app/interfaces/genre.interface';
 import { HashTable } from 'src/app/interfaces/hashtable.interface';
-import { NavPages } from 'src/app/interfaces/navpages.interface';
 import { BookService } from 'src/app/services/book/book.service';
 import { environment } from 'src/environments/environment';
-
-interface Filters {
-  checked: boolean,
-  searchString: string,
-  editeurs: Editeur[],
-  genres: Genre[],
-  auteurs: Auteur[]
-}
-
-interface Sorts {
-  sortCategory: string,
-  sortSense: number
-}
 
 @Component({
   selector: 'app-catalog',
@@ -33,86 +20,97 @@ export class CatalogComponent {
 
   imgBackend: string = environment.imgBackend
 
-  refreshFilter: number = 0
   searchValue: string = ''
 
-  nbRowByPage: number = 4
+  refreshPagesSubcription!: Subscription
+  refreshPages: number = 0
+  pages: number[] = []
 
   editeursChecked: HashTable<Editeur> = {}
   genresChecked: HashTable<Genre> = {}
   auteursChecked: HashTable<Auteur> = {}
 
-  filters: Filters = {
-    checked: true,
-    searchString: '',
-    editeurs: [],
-    genres: [],
-    auteurs: []
-  }
-
-  sorts: Sorts = {
-    sortCategory: 'titre',
-    sortSense: 1
-  }
-
   constructor (
     private bookService: BookService,
-    private router: Router
+    private router: Router,
+    private changeDetectorRef: ChangeDetectorRef
   ) {
+    this.getEditeursFromBdd()
   }
 
   ngOnInit(): void {
 
-    this.getBooksFromBdd()
+    this.refreshPagesSubcription = new Observable(observer => {
+      this.bookService.refreshPages = observer
+    }).subscribe(val => {
+      console.log('numpage', this.bookService.pages.numPage)
+      console.log('numberpages', this.bookService.pages.numberPages)
+      console.log('navFirst', this.bookService.pages.navFirst)
+      console.log('navnumber', this.bookService.pages.navNumber)
+      console.log('min', Math.min(this.bookService.pages.numberPages, this.bookService.pages.numPage + this.bookService.pages.navNumber + 1))
+
+      this.pages = []
+
+      for (let i = this.bookService.pages.navFirst;
+        i < Math.min(this.bookService.pages.numberPages, this.bookService.pages.numPage + this.bookService.pages.navNumber + 1);
+        i++
+        ) {
+          console.log('i', i)
+        this.pages.push(i)
+      }
+//      this.pages = pagesInter
+      console.log('pages', this.pages)
+//      this.changeDetectorRef.detectChanges()
+    })
 
   }
 
   searchBooks = () => {
     this.bookService.pages.numPage = 0
-    this.filters.searchString = this.searchValue
-    this.refreshFilter++
+    this.bookService.filters.searchString = this.searchValue
+    this.bookService.filters.refreshFilters++
   }
 
   sortBy = (category: string) => {
-    if (this.sorts.sortCategory === category) {
-      this.sorts.sortSense *= -1
+    if (this.bookService.sorts.sortCategory === category) {
+      this.bookService.sorts.sortSense *= -1
     }
     else {
-      this.sorts.sortCategory = category
-      this.sorts.sortSense = 1
+      this.bookService.sorts.sortCategory = category
+      this.bookService.sorts.sortSense = 1
     }
     this.bookService.pages.numPage = 0
-    this.filters.searchString = this.searchValue
-    this.refreshFilter++
+    this.bookService.filters.searchString = this.searchValue
+    this.bookService.filters.refreshFilters++
   }
 
   checkCategory = (category: string, nom: string) => {
     switch (category) {
       case 'editeur' : {
         this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
-        this.filters.checked = false
+        this.bookService.filters.checked = false
         break;
       }
       case 'genre' : {
         this.genresChecked[nom].checked = !this.genresChecked[nom].checked
-        this.filters.checked = false
+        this.bookService.filters.checked = false
         break;
       }
       case 'auteur' : {
         this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
-        this.filters.checked = false
+        this.bookService.filters.checked = false
         break;
       }
       default : {
-        this.filters.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
-        this.filters.genres.forEach((genre: Genre) => genre.checked = false)
-        this.filters.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
-        this.filters.checked = !this.filters.checked
+        this.bookService.filters.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
+        this.bookService.filters.genres.forEach((genre: Genre) => genre.checked = false)
+        this.bookService.filters.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
+        this.bookService.filters.checked = !this.bookService.filters.checked
       }
     }
     this.bookService.pages.numPage = 0
-    this.filters.searchString = this.searchValue
-    this.refreshFilter++
+    this.bookService.filters.searchString = this.searchValue
+    this.bookService.filters.refreshFilters++
   }
 
   navigateTo = (index?: Number) => {
@@ -130,7 +128,6 @@ export class CatalogComponent {
     this.bookService.getBooksByStatus('non_loue').subscribe({
       next: (res: Book[]) => {
         this.bookService.books = res
-        this.getEditeursFromBdd()
       },
       error: (error: { error: { message: any; }; }) => {
         this.errorMessage = error.error.message
@@ -198,41 +195,47 @@ export class CatalogComponent {
 
   initTemplate = () => {
 
-    this.filters.editeurs = this.bookService.editeurs
+    this.bookService.filters.editeurs = this.bookService.editeurs
     this.bookService.editeurs.forEach(element => {
       element.checked = false
       this.editeursChecked[element.nom] = element
     });
-    console.log(this.filters.editeurs)
-    this.filters.genres = this.bookService.genres
+    console.log(this.bookService.filters.editeurs)
+    this.bookService.filters.genres = this.bookService.genres
     this.bookService.genres.forEach(element => {
       element.checked = false
       this.genresChecked[element.nom] = element
     });
-    this.filters.auteurs = this.bookService.auteurs
+    this.bookService.filters.auteurs = this.bookService.auteurs
     this.bookService.auteurs.forEach(element => {
       element.checked = false
       this.auteursChecked[element.nom] = element
     });
+    this.getBooksFromBdd()
 
-    this.refreshFilter++
-    this.setNbRowByPage()
+//    this.setNbRowByPage()
+//    this.refreshFilter++
 
   }
 
   managePage = (page: number) => {
+    console.log(page)
     if (page >= 0 && page < this.bookService.pages.numberPages) {
       this.bookService.pages.numPage = page
-      this.refreshFilter++
+      this.bookService.filters.refreshFilters++
     }
   }
 
-  setNbRowByPage = () => {
-    if (this.nbRowByPage < 1)
+  setNbRowByPage = (event: Event) => {
+    const value = (event.target as HTMLInputElement).value;
+    if (+value < 1)
       this.bookService.pages.nbRowByPage = 1
-    else
-      this.bookService.pages.nbRowByPage = this.nbRowByPage
-    this.bookService.pages.numPage = 0
+    else {
+      this.bookService.pages.nbRowByPage = +value
+      this.bookService.pages.numPage = 0
+    }
+//      this.changeDetectorRef.detectChanges()
+    this.bookService.filters.refreshFilters++
   }
 
   getNumberPages = () => {
@@ -245,6 +248,38 @@ export class CatalogComponent {
 
   getNbRowByPage = () => {
     return this.bookService.pages.nbRowByPage
+  }
+
+  getRefreshPages = () => {
+    return this.bookService.pages.refreshPages
+  }
+
+  getEditeurs = () => {
+    return this.bookService.filters.editeurs
+  }
+
+  getAuteurs = () => {
+    return this.bookService.filters.auteurs
+  }
+
+  getGenres = () => {
+    return this.bookService.filters.genres
+  }
+
+  getChecked = () => {
+    return this.bookService.filters.checked
+  }
+
+  getRefreshFilters = () => {
+    return this.bookService.filters.refreshFilters
+  }
+
+  getSortCategory = () => {
+    return this.bookService.sorts.sortCategory
+  }
+
+  getSortSense = () => {
+    return this.bookService.sorts.sortSense
   }
 
 }

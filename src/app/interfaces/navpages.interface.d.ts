@@ -4,5 +4,6 @@ export interface NavPages {
   navFirst: number,
   navNumber: number,
   nbRowByPage: number,
-  numPage: number
+  numPage: number,
+  refreshPages: number
 }

@@ -43,7 +43,18 @@ export class BookService implements OnInit{
     editeurs: [],
     genres: [],
     auteurs: [],
-    refreshFilters: 0
+    refreshFilters: 0,
+    nbSelected: 0,
+    nbFiltred: 0,
+    titres: [{
+        nom: 'tous',
+        checked: true
+      },
+      {
+        nom: 'selected',
+        checked: false
+      },
+    ]
   }
 
   sorts: Sorts = {
@@ -72,6 +83,7 @@ export class BookService implements OnInit{
     this.getEditeurs()
     this.getGenres()
     this.getAuteurs()
+    this.getBooksFromBdd()
   }
 
   ngOnInit(): void {
@@ -115,11 +127,42 @@ export class BookService implements OnInit{
 
   }
 
+  postEmpruntLivre(book: Book): Observable<any> {
+
+    return this.http.post(
+      environment.useBackend + `/emprunt/livre/${book.id}`,
+      {
+        exemplaire: {id: 0},
+        adherent: {id: 1},
+        dateEmprunt: '2023-05-10',
+        dateRetour: '2023-05-10',
+        statut: 'LOUE',
+      }
+    )
+
+  }
+
   getBooks(): Observable<any> {
 
     return this.http.get(
       environment.useBackend + `/book/`
     )
+
+  }
+
+  getBooksFromBdd = () => {
+
+    this.getBooksByStatus('non_loue').subscribe({
+      next: (res: Book[]) => {
+        this.books = res
+      },
+      error: (error: { error: { message: any; }; }) => {
+        console.log(error.error.message)
+      },
+      complete () {
+        console.log('header getBooks complete')
+      }
+    })
 
   }
 

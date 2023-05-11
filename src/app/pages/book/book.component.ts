@@ -36,9 +36,9 @@ export class BookComponent implements OnInit {
 
   }
 
-  navigateTo = (id?: number) => {
+  navigateTo = (dest: string) => {
 
-    //    this.router.navigate([this.libraryService.setSelected(dest)], {queryParams: {id: id}})
+    this.router.navigate([dest])
 
   }
 

@@ -5,7 +5,7 @@
 }
 
 .div-books {
-  min-height: 68vh;
+  min-height: 73.5vh;
   overflow-y: auto;
   width: 100%;
 }
@@ -17,7 +17,7 @@
 }
 
 .search-bar {
-  
+
   position: fixed;
   overflow: hidden;
 }
@@ -76,4 +76,13 @@ input[type='checkbox'] {
 
 .row-per-page {
   width: 70px;
+}
+
+.selected {
+  background-color: lightseagreen;
+}
+
+.center {
+  margin-top: 12%;
+  margin-left: 42%;
 }

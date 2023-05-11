@@ -1,11 +1,18 @@
 <div class="page">
-  <div class="row row-cols-2 books">
-    <div class="col col-3"></div>
-    <div aria-label="Page navigation example" class="col col-9 d-flex flex-row w-100 mt-3 mb-3 mx-0">
-      <div class="col col-1"></div>
-    </div>
-  </div>
   <div class="div-books">
+    <div class="books d-flex flex-row">
+      <div class="col col-3"></div>
+      <div class="col col-9 d-flex">
+        <h3 *ngIf="!getTitres()[1].checked" class="flex-grow-1">Livres disponibles</h3>
+        <h3 *ngIf="getTitres()[1].checked" class="flex-grow-1">Livres séléctionnés</h3>
+        <button *ngIf="getNbSelected() > 0"
+          class="btn btn-outline-secondary" (click)="validLocations()">
+          Valider {{getNbSelected()}} location(s)
+        </button>
+      </div>
+      <div class="col col-3">
+      </div>
+    </div>
     <div class="row row-cols-2 books">
       <div class="col col-3 d-flex flex-column">
         <div class="categories">
@@ -15,7 +22,7 @@
             <button class="btn btn-outline-success my-5 my-sm-0" (click)="searchBooks()">Search</button>
           </form>
           <ng-container [ngTemplateOutlet]="categorytemplate"
-          [ngTemplateOutletContext]="{category: 'titre', elements: [{nom: 'Tous'}], categorylibelle: 'Titre'}">
+          [ngTemplateOutletContext]="{category: 'titre', elements: getTitres(), categorylibelle: 'Titre'}">
           </ng-container>
           <ng-container [ngTemplateOutlet]="categorytemplate"
           [ngTemplateOutletContext]="{category: 'editeur', elements: getEditeurs(), categorylibelle: 'Editeurs'}">
@@ -37,6 +44,9 @@
         </div>
       </div>
     </div>
+    <div *ngIf="!getTitres()[1].checked && getNbFiltred() === 0" class="center w-100"><h1>Pas de livre disponible pour ce filtre</h1></div>
+    <div *ngIf="getTitres()[1].checked && getNbSelected() === 0" class="center w-100"><h1>Pas de livre séléctionné</h1></div>
+    <div *ngIf="getTitres()[1].checked && getNbSelected() !== 0 && getNbFiltred() === 0" class="center w-100"><h1>Pas de livre séléctionné pour ce filtre</h1></div>
   </div>
   <div class="row row-cols-2 books">
     <div aria-label="Page navigation example" class="col col-9 d-flex flex-row w-100 mb-3 mx-0">
@@ -70,14 +80,14 @@
   </div>
   <ul>
     <li *ngFor="let element of elements" class="me-2">
-      <input type="checkbox" [checked]="category === 'titre' ? getChecked() : element.checked" (click)="checkCategory(category, element.nom)"/>
+      <input type="checkbox" [checked]="element.checked" (click)="checkCategory(category, element.nom)"/>
       <label>{{element.nom}}</label>
     </li>
   </ul>
 </ng-template>
 
 <ng-template #booktemplate let-book="book">
-  <div class="d-flex flex-row m-0">
+  <div [ngClass]="book.selected ? 'd-flex flex-row m-0 selected' : 'd-flex flex-row m-0'">
     <img class="book-image border border-4 m-2"
     src="{{imgBackend}}/images/livres/{{book.image_name}}"
     (click)="navigateTo(book.index)"
@@ -91,13 +101,24 @@
             {{(i !== 0) ? '-' : ''}} {{genre.genre.nom}}&nbsp;</div>
         </div>
         <div class="mt-auto ps-3 pb-3">
-          <p class="mb-0">{{book.description.substring(0, 160)}} ...</p>
+          <p class="mb-0">{{book.description ? book.description.substring(0, (book.description.length < 160 ? book.description.length : 160)) : ""}} ...</p>
         </div>
       </div>
       <div class="ms-auto me-2 book-icons">
-        <div (click)="navigateTo(book.index)">
+        <div *ngIf="!book.selected" (click)="select(book.index, 1)">
           <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart2" viewBox="0 0 16 16">
             <path d="M0 2.5A.5.5 0 0 1 .5 2H2a.5.5 0 0 1 .485.379L2.89 4H14.5a.5.5 0 0 1 .485.621l-1.5 6A.5.5 0 0 1 13 11H4a.5.5 0 0 1-.485-.379L1.61 3H.5a.5.5 0 0 1-.5-.5zM3.14 5l1.25 5h8.22l1.25-5H3.14zM5 13a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0zm9-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2zm-2 1a2 2 0 1 1 4 0 2 2 0 0 1-4 0z"/>
+          </svg>
+        </div>
+        <div *ngIf="book.selected" (click)="select(book.index, -1)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cart-x-fill" viewBox="0 0 16 16">
+            <path d="M.5 1a.5.5 0 0 0 0 1h1.11l.401 1.607 1.498 7.985A.5.5 0 0 0 4 12h1a2 2 0 1 0 0 4 2 2 0 0 0 0-4h7a2 2 0 1 0 0 4 2 2 0 0 0 0-4h1a.5.5 0 0 0 .491-.408l1.5-8A.5.5 0 0 0 14.5 3H2.89l-.405-1.621A.5.5 0 0 0 2 1H.5zM6 14a1 1 0 1 1-2 0 1 1 0 0 1 2 0zm7 0a1 1 0 1 1-2 0 1 1 0 0 1 2 0zM7.354 5.646 8.5 6.793l1.146-1.147a.5.5 0 0 1 .708.708L9.207 7.5l1.147 1.146a.5.5 0 0 1-.708.708L8.5 8.207 7.354 9.354a.5.5 0 1 1-.708-.708L7.793 7.5 6.646 6.354a.5.5 0 1 1 .708-.708z"/>
+          </svg>
+        </div>
+        <div (click)="navigateTo(book.index)">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z"/>
+            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z"/>
           </svg>
         </div>
       </div>

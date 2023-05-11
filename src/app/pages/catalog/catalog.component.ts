@@ -40,6 +40,8 @@ export class CatalogComponent {
 
   ngOnInit(): void {
 
+//    this.bookService.getBooksFromBdd()
+
     this.refreshPagesSubcription = new Observable(observer => {
       this.bookService.refreshPages = observer
     }).subscribe(val => {
@@ -85,27 +87,35 @@ export class CatalogComponent {
   }
 
   checkCategory = (category: string, nom: string) => {
+    console.log('nom', nom, 'category', category)
     switch (category) {
       case 'editeur' : {
         this.editeursChecked[nom].checked = !this.editeursChecked[nom].checked
-        this.bookService.filters.checked = false
+        this.bookService.filters.titres[0].checked = false
         break;
       }
       case 'genre' : {
         this.genresChecked[nom].checked = !this.genresChecked[nom].checked
-        this.bookService.filters.checked = false
+        this.bookService.filters.titres[0].checked = false
         break;
       }
       case 'auteur' : {
         this.auteursChecked[nom].checked = !this.auteursChecked[nom].checked
-        this.bookService.filters.checked = false
+        this.bookService.filters.titres[0].checked = false
         break;
       }
-      default : {
-        this.bookService.filters.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
-        this.bookService.filters.genres.forEach((genre: Genre) => genre.checked = false)
-        this.bookService.filters.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
-        this.bookService.filters.checked = !this.bookService.filters.checked
+      case 'titre' : {
+        if (nom === 'tous') {
+          this.bookService.filters.editeurs.forEach((editeur: Editeur) => editeur.checked = false)
+          this.bookService.filters.genres.forEach((genre: Genre) => genre.checked = false)
+          this.bookService.filters.auteurs.forEach((auteur: Auteur) => auteur.checked = false)
+          this.bookService.filters.titres[0].checked = true
+          this.bookService.filters.titres[1].checked = false
+        } else {
+          this.bookService.filters.titres[0].checked = false
+          this.bookService.filters.titres[1].checked = true
+        }
+
       }
     }
     this.bookService.pages.numPage = 0
@@ -211,7 +221,7 @@ export class CatalogComponent {
       element.checked = false
       this.auteursChecked[element.nom] = element
     });
-    this.getBooksFromBdd()
+//    this.getBooksFromBdd()
 
 //    this.setNbRowByPage()
 //    this.refreshFilter++
@@ -236,6 +246,10 @@ export class CatalogComponent {
     }
 //      this.changeDetectorRef.detectChanges()
     this.bookService.filters.refreshFilters++
+  }
+
+  getTitres = () => {
+    return this.bookService.filters.titres
   }
 
   getNumberPages = () => {
@@ -266,8 +280,12 @@ export class CatalogComponent {
     return this.bookService.filters.genres
   }
 
-  getChecked = () => {
-    return this.bookService.filters.checked
+  getNbSelected = () => {
+    return this.bookService.filters.nbSelected
+  }
+
+  getNbFiltred = () => {
+    return this.bookService.filters.nbFiltred
   }
 
   getRefreshFilters = () => {
@@ -280,6 +298,33 @@ export class CatalogComponent {
 
   getSortSense = () => {
     return this.bookService.sorts.sortSense
+  }
+
+  select = (index: number, sens: number) => {
+    this.bookService.filters.nbSelected += sens
+    this.bookService.books[index].selected = ! this.bookService.books[index].selected
+    if (this.bookService.filters.titres[1].checked && !this.bookService.books[index].selected)
+      this.bookService.filters.refreshFilters++
+  }
+
+  validLocations = () => {
+    this.bookService.books.filter(book => {
+      return book.selected
+    })
+    .forEach(book => {
+      this.bookService.postEmpruntLivre(book).subscribe({
+        next: (res: any) => {
+          console.log(res)
+        },
+        error: (error: { error: { message: any; }; }) => {
+          alert('erreur sur post emprunt')
+        },
+        complete () {
+          console.log(`post emprunt complete`)
+        }
+      })
+
+    })
   }
 
 }

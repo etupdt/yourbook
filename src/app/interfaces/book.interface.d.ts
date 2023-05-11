@@ -11,5 +11,6 @@ export interface Book {
   editeur: Editeur,
   image_name: string,
   genres: {genre: Genre}[],
-  index?: number
+  index?: number,
+  selected?: boolean
 }

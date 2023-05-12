@@ -21,7 +21,7 @@ COPY ./studi-public.crt /etc/ssl/apache2/angular-yourbook/
 COPY ./studi-private.key /etc/ssl/apache2/angular-yourbook/
 
 RUN apt-get install -y ca-certificates
-RUN cp ./studi-cacert.crt /usr/local/share/ca-certificates
+COPY ./studi-cacert.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 COPY ./dist/yourbook /usr/local/apache2/html/

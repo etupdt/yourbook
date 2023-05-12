@@ -10,8 +10,7 @@ phases:
       - npm install
       - npm install -g @angular/cli
       - npm update
-#      - amazon-linux-extras install docker
-      - service docker start
+
       - ls -lrt
 
   pre_build:

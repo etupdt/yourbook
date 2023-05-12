@@ -1,7 +1,7 @@
 
 FROM httpd:latest
 
-SHELL ["/bin/bash"]
+SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p /etc/ssl/apache2/angular-yourbook
 RUN mkdir -p /etc/ssl/apache2/angular-yourbook
@@ -14,8 +14,8 @@ RUN echo "Include /usr/local/apache2/conf/httpd-vhosts-443.conf" >> /usr/local/a
 #RUN cat /usr/local/apache2/conf/httpd.conf | grep -v "Listen 443" > /usr/local/apache2/conf/httpd.conf
 RUN echo "Listen 443" >> /usr/local/apache2/conf/httpd.conf
 
-RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf | grep -v "VirtualHost" > /usr/local/apache2/conf/extra/httpd-ssl.conf
-RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf | grep -v "443" > /usr/local/apache2/conf/extra/httpd-ssl.conf
+RUN mv /usr/local/apache2/conf/extra/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf.old
+RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf.old | grep -v "VirtualHost" | grep -v "443" > /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 COPY ./studi-public.crt /etc/ssl/apache2/angular-yourbook/
 COPY ./studi-private.key /etc/ssl/apache2/angular-yourbook/

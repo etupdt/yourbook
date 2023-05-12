@@ -19,7 +19,10 @@ RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf | grep -v "443" > /usr/loca
 
 COPY ./studi-public.crt /etc/ssl/apache2/angular-yourbook/
 COPY ./studi-private.key /etc/ssl/apache2/angular-yourbook/
-COPY ./studi-cacert.crt /etc/pki/ca-trust/source/anchors/
+
+RUN apt-get install -y ca-certificates
+RUN cp studi-cacert.crt /usr/local/share/ca-certificates
+RUN update-ca-certificates
 
 COPY ./dist/yourbook /usr/local/apache2/html/
 

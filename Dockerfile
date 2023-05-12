@@ -25,5 +25,3 @@ COPY ./studi-cacert.crt /usr/local/share/ca-certificates
 RUN update-ca-certificates
 
 COPY ./dist/yourbook /usr/local/apache2/html/
-
-RUN update-ca-trust

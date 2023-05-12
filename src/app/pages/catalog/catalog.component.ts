@@ -314,6 +314,9 @@ export class CatalogComponent {
     .forEach(book => {
       this.bookService.postEmpruntLivre(book).subscribe({
         next: (res: any) => {
+          this.bookService.books.splice(book.index!, 1)
+          this.bookService.filters.nbSelected--
+          this.bookService.filters.refreshFilters++
           console.log(res)
         },
         error: (error: { error: { message: any; }; }) => {

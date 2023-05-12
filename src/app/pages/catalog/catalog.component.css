@@ -23,6 +23,7 @@
 }
 
 .categories {
+  margin-top: 4%;
   position: fixed;
   height: 50vh;
 }
@@ -79,7 +80,15 @@ input[type='checkbox'] {
 }
 
 .selected {
-  background-color: lightseagreen;
+  background-color: #eeeeee;
+}
+
+.selected-lib {
+  color: lightseagreen;
+}
+
+.dispo-lib {
+  color: lightgrey;
 }
 
 .center {

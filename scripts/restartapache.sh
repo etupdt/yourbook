@@ -4,23 +4,7 @@ log=/var/log/deploy/restartapache_synffront.log
 
 echo 'exec restartapache.sh' |& sudo tee $log
 
-echo '<=======================  apache & php  ===========================>' | sudo tee -a $log
+aws ecr get-login-password --region eu-west-3 | sudo docker login --username AWS --password-stdin 498746666064.dkr.ecr.eu-west-3.amazonaws.com
 
-#sudo yum install httpd -y |& sudo tee -a $log
-
-#curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash -
-
-#=============================================== apache =====================================================
-echo 'apache' | sudo tee -a $log
-
-cat /etc/httpd/conf/httpd.conf | grep -v "httpd-vhosts-443.conf" | sudo tee /etc/httpd/conf/httpd.conf > /dev/null
-echo "Include /var/www/html/angular_yourbook/scripts/httpd-vhosts-443.conf" | sudo tee -a /etc/httpd/conf/httpd.conf > /dev/null
-
-cat /etc/httpd/conf/httpd.conf | grep -v "Listen 443" | sudo tee /etc/httpd/conf/httpd.conf > /dev/null
-echo "Listen 443" | sudo tee -a /etc/httpd/conf/httpd.conf > /dev/null
-
-cat /etc/httpd/conf.d/ssl.conf | grep -v "VirtualHost" | sudo tee /etc/httpd/conf.d/ssl.conf > /dev/null
-cat /etc/httpd/conf.d/ssl.conf | grep -v "443" | sudo tee /etc/httpd/conf.d/ssl.conf > /dev/null
-
-sudo service httpd stop |& tee -a $log
-sudo service httpd start |& tee -a $log
+sudo docker pull 498746666064.dkr.ecr.eu-west-3.amazonaws.com/yourbook:latest
+sudo docker run -p 8443:8443 498746666064.dkr.ecr.eu-west-3.amazonaws.com/yourbook

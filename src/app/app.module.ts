@@ -23,6 +23,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { BookFilterPipe } from './pages/catalog/book-filter.pipe';
 import { FormsModule } from '@angular/forms';
 import { NavPagesPipe } from './pages/catalog/nav-pages.pipe';
+import { ReactiveFormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { NavPagesPipe } from './pages/catalog/nav-pages.pipe';
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    ReactiveFormsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

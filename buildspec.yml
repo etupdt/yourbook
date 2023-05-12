@@ -12,20 +12,26 @@ phases:
       - ls -lrt
   pre_build:
     commands:
-      - echo Installing source NPM dependencies...
+      - echo pre-Build started on `date`
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
     commands:
       - echo Build started on `date`
       - ng build --configuration=production
       - npm prune --production
+      
+      - aws s3 cp s3://studi-interspe/symfony/ssl/studi-public.crt .
+      - aws s3 cp s3://studi-interspe/symfony/ssl/studi-private.key .
+      - aws s3 cp s3://studi-interspe/symfony/ssl/studi-cacert.crt .
+
+      - docker build -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
   post_build:
     commands:
+      - echo post-Build started on `date`
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      - echo Build completed on `date`
       - cp appspec.yml dist/
       - cp -r scripts dist/
-      - cd dist
-      - pwd
-      - ls -lrt
-      - echo Build completed on `date`
 artifacts:
   base-directory: dist
   files:

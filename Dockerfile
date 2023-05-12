@@ -1,7 +1,7 @@
 
 FROM httpd:latest
 
-SHELL ["/bin/bash", "-c"]
+SHELL ["/bin/bash"]
 
 RUN mkdir -p /etc/ssl/apache2/angular-yourbook
 RUN mkdir -p /etc/ssl/apache2/angular-yourbook

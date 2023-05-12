@@ -19,7 +19,7 @@ phases:
       - echo Build started on `date`
       - ng build --configuration=production
       - npm prune --production
-      
+
       - aws s3 cp s3://studi-interspe/symfony/ssl/studi-public.crt .
       - aws s3 cp s3://studi-interspe/symfony/ssl/studi-private.key .
       - aws s3 cp s3://studi-interspe/symfony/ssl/studi-cacert.crt .
@@ -29,9 +29,10 @@ phases:
   post_build:
     commands:
       - echo post-Build started on `date`
-      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG      - echo Build completed on `date`
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
       - cp appspec.yml dist/
       - cp -r scripts dist/
+      - echo Build completed on `date`
 artifacts:
   base-directory: dist
   files:

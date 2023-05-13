@@ -15,7 +15,7 @@ RUN sed -i \
 RUN echo "Include /usr/local/apache2/conf/extra/httpd-vhosts-443.conf" >> /usr/local/apache2/conf/extra/httpd-vhosts.conf
 
 #RUN cat /usr/local/apache2/conf/httpd.conf | grep -v "Listen 443" > /usr/local/apache2/conf/httpd.conf
-RUN sed -i 's/^DocumentRoot.*$//' /usr/local/apache2/conf/httpd.conf
+RUN sed -i 's/^DocumentRoot.*$/DocumentRoot/' /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 #RUN mv /usr/local/apache2/conf/extra/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf.old
 #RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf.old | grep -v "VirtualHost" | grep -v "443" > /usr/local/apache2/conf/extra/httpd-ssl.conf

@@ -12,16 +12,17 @@ RUN sed -i \
 		/usr/local/apache2/conf/httpd.conf
 
 #RUN cat /usr/local/apache2/conf/extra/httpd-vhosts.conf | grep -v "httpd-vhosts-443.conf" > /usr/local/apache2/conf/extra/httpd-vhosts.conf
-RUN echo "Include /usr/local/apache2/conf/extra/httpd-vhosts-443.conf" >> /usr/local/apache2/conf/extra/httpd-vhosts.conf
+#RUN echo "Include /usr/local/apache2/conf/extra/httpd-vhosts-443.conf" >> /usr/local/apache2/conf/extra/httpd-vhosts.conf
 
 #RUN cat /usr/local/apache2/conf/httpd.conf | grep -v "Listen 443" > /usr/local/apache2/conf/httpd.conf
-RUN sed -i 's/^DocumentRoot.*$/DocumentRoot "\/usr\/local\/apache2\/html\/angular-yorubook"/' /usr/local/apache2/conf/extra/httpd-ssl.conf
+#RUN sed -i 's/^DocumentRoot.*$/DocumentRoot "\/usr\/local\/apache2\/html\/angular-yourbook"/' /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 #RUN mv /usr/local/apache2/conf/extra/httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf.old
 #RUN cat /usr/local/apache2/conf/extra/httpd-ssl.conf.old | grep -v "VirtualHost" | grep -v "443" > /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 COPY ./studi-public.crt /usr/local/apache2/conf/server.crt
 COPY ./studi-private.key /usr/local/apache2/conf/server.key
+COPY ./httpd-ssl.conf /usr/local/apache2/conf/extra/httpd-ssl.conf
 
 RUN apt-get install -y ca-certificates
 COPY ./studi-cacert.crt /usr/local/share/ca-certificates
